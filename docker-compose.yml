@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: hotel-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./hotel_reservation-api:/var/www
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini
+    depends_on:
+      mysql:
+        condition: service_healthy   # Só inicia quando MySQL estiver 100% pronto
+    networks:
+      - hotel-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: hotel-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./hotel_reservation-api:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - hotel-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    hostname: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: hotel_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: password
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "laravel", "-ppassword"]
+      timeout: 20s
+      retries: 15
+      interval: 5s
+    networks:
+      - hotel-network
+
+volumes:
+  mysql-data:
+
+networks:
+  hotel-network:
+    driver: bridge

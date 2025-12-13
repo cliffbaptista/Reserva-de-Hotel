@@ -123,6 +123,6 @@ graph TD
     E --> F
 
 ### Envolvidos no Projeto
-1. CLiff Baptista 
+1. Cliff Baptista 
 2. Francisco Davi
 3. Daniel Carmo

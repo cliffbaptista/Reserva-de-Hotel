@@ -110,7 +110,7 @@ http://localhost:8000/api/reservations
 Nginx + PHP + Laravel + MySQL
 
 ##### FLUXO ARQUITETURAL.
-
+```mermaid
 graph TD
     A[Cliente] -->|HTTP JSON| B(Nginx)
     B --> C[Laravel]
@@ -121,6 +121,7 @@ graph TD
     G --> H[Entities]
     H --> I[MySQL]
     E --> F
+```
 
 ### Envolvidos no Projeto
 1. Cliff Baptista 

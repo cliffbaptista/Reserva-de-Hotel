@@ -5,6 +5,15 @@ echo   INICIANDO HOTEL RESERVATION API (DOCKER)
 echo ==============================================
 echo.
 
+if not exist .env (
+    echo Criando .env...
+    copy .env.example .env
+    powershell -Command "(gc .env) -replace 'DB_HOST=.*', 'DB_HOST=mysql' | Out-File -encoding ASCII .env"
+    powershell -Command "(gc .env) -replace 'DB_DATABASE=.*', 'DB_DATABASE=hotel_db' | Out-File -encoding ASCII .env"
+    powershell -Command "(gc .env) -replace 'DB_USERNAME=.*', 'DB_USERNAME=sail' | Out-File -encoding ASCII .env"
+    powershell -Command "(gc .env) -replace 'DB_PASSWORD=.*', 'DB_PASSWORD=password' | Out-File -encoding ASCII .env"
+)
+
 docker-compose down -v
 docker volume prune -f
 
@@ -18,7 +27,7 @@ timeout /t 60 >nul
 
 echo.
 echo Executando comandos...
-docker exec -it hotel-app bash -c "composer install --no-scripts --no-interaction && php artisan key:generate && rm -rf database/migrations/* && php artisan doctrine:migrations:diff && php artisan doctrine:migrations:migrate --no-interaction && php artisan doctrine:generate:proxies && php artisan db:seed && echo TUDO PRONTO! Acesse: http://localhost:8000/api/reservations"
+docker exec -it hotel-app bash -c "composer install --no-scripts && php artisan key:generate && rm -rf database/migrations/* && php artisan doctrine:migrations:diff && php artisan doctrine:migrations:migrate --no-interaction && php artisan doctrine:generate:proxies && php artisan db:seed && echo TUDO PRONTO! Acesse: http://localhost:8000/api/reservations"
 
 echo.
 echo ==============================================
